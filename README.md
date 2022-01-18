@@ -81,10 +81,10 @@ I suggest:
 - Use `GET` instead of `POST`, because we are retreating data
 - Use meaningful words,instead of `cdr` or `overall`,`components`
 - If station has rate and usage why we should send it to another api for calculation, I think in concept of microservice it's better
-we should get rate from another service and get usage form another one.
+to get rate from another service and get usage form another one.
 - the Api result should be wrap with `data` keyword, and in case of error should has `errors` keyword
-- (optional) In my opinion it's better to define keys as `snake_case`, because most developer use `camelCase` in their code,when we use `snake_case` in developing process the data come from request 
+- (optional) In my opinion it's better to define keys as `snake_case`, because most developer use `camelCase` in their code,it helps us find out request data from our local variables. 
 this rule exist for response too
 - In the response we need specify the unit of our currency, it's better instead of show a number show object that contain number and price unit
 - set `apiVersion` in our api response
-- we can also add request status in our response
+- we can also add request `status code` in our response
