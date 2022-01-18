@@ -72,7 +72,7 @@ For running tests simply run below command:
     docker-compose exec php php ./vendor/bin/phpunit tests
 ```
 
-## About better Design Api:
+## About better Api Design :
 base one my knowledge and below references:
  - [json.org](https://www.json.org/json-en.html)
  - [Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml)
