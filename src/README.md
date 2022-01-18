@@ -1,61 +1,89 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## About Project
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Base on the test assessment, I create system to calculate price of charging.
 
-## About Laravel
+## About Structure
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- `app`
+    - `Controllers`
+        - `ChargeStationController` to get request, there is no logic in there just get input params and send output to
+          resource class
+    - `ValueObjects`
+        - `ChargeStationValueObject` this class has responsibility to get inputs and parse it, also some simple
+          operation
+    - `Services`
+        - `ChargeStationService` the main logic of application is there(domain layer)
+    - `resource`
+        - `RateCalculatorResource` for representation layer use this resource class
+    - `Request`
+        - `RateCalculatorRequest` this class set input requirements
+    - `tests`
+        - `feature` test the api work perfectly
+        - `unit` test our functionality in domain layer
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Install Application
+- For running application you need Docker installed on your system, and follow instructions;
+  ```bash
+    docker-compose build --no-cache
+    docker-compose up -d
+  ```
+  after run docker container we have our service at `localhost:8080`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# API Document
+-----------------
+- You can send data in `POST` to the following URL:
+```
+http://localhost:8000/api/v1/rate
+```
+- Body:
+```
+{
+    "rate": {
+        "energy": 0.3,
+        "time": 2,
+        "transaction": 1
+    },
+    "cdr": {
+        "meterStart": 1204307,
+        "timestampStart": "2021-04-05T10:04:00Z",
+        "meterStop": 1215230,
+        "timestampStop": "2021-04-05T11:27:00Z"
+    }
+}
+```
 
-## Learning Laravel
+- Response:
+```
+{
+    "overall": 7.04,
+    "components": {
+        "energy": 3.277,
+        "time": 2.767,
+        "transaction": 1
+    }
+}
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Running Tests
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+For running tests simply run below command:
+```bash
+    docker-compose exec php php ./vendor/bin/phpunit tests
+```
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## About better Design Api:
+base one my knowledge and below references:
+ - [json.org](https://www.json.org/json-en.html)
+ - [Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml)
+ 
+I suggest:
+- Use `GET` instead of `POST`, because we are retreating data
+- Use meaningful words,instead of `cdr` or `overall`,`components`
+- If station has rate and usage why we should send it to another api for calculation, I think in concept of microservice it's better
+we should get rate from another service and get usage form another one.
+- the Api result should be wrap with `data` keyword, and in case of error should has `errors` keyword
+- (optional) In my opinion it's better to define keys as `snake_case`, because most developer use `camelCase` in their code,when we use `snake_case` in developing process the data come from request 
+this rule exist for response too
+- In the response we need specify the unit of our currency, it's better instead of show a number show object that contain number and price unit
+- set `apiversioning` in our api response
+- we can also add request status in our response
